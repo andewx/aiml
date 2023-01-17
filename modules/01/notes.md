@@ -29,8 +29,11 @@
 - Outcome - Result of a single trial
 - Probability Experiment - Experiment for which the outcome cannot be predicted with certainty
 - Event - can represent a subset of possible outcomes (even/odd), or multiple outcomes.
-- Simple event - represents a signle outcome.
+- Simple event - represents a single outcome.
 
 > According to classical probability sample spaces can be used to determine the numerical probability that an event will happen.
 
 > Classical probability assumes the all outcomes in the sample space are equally likely to occur independently of one another.
+
+- Complementary Events - The set of outcomes in the sample space that were not present for a particular event "E".
+xs
