@@ -1,18 +1,18 @@
-# aiml
+# CSC532 - Introduction to Machine Learning
 Notebooks, Materials, Notes &amp; Projects for CSC532
 
-# course syllabus 
+# Course syllabus 
 
 ------------------
 
-# textbooks and materials
+# Textbooks and materials
 
-## core
+## Core
 
 - [Machine Learning with R - Third Edition - Brett Lantz](https://www.oreilly.com/library/view/machine-learning-with/9781788295864/)
 - [An Introduction to Statistical Learning with Application in R - 2nd Edition - Garteh James, et al](https://hastie.su.domains/ISLR2/ISLRv2_website.pdf)
 
-## supplemental
+## Supplemental
 
 - [Practical Statistics for Data Scientists, 2nd Edition - Peter Bruce, et al.](https://learning.oreilly.com/library/view/practical-statistics-for/9781492072935/)
 - [The Elements of Statistical Learning, Mining, Inference, and Prediction, 2nd Edition - Trevor Hastie, et al.](https://web.stanford.edu/~hastie/ElemStatLearn/)
@@ -22,7 +22,7 @@ Notebooks, Materials, Notes &amp; Projects for CSC532
 - [Deep Learning with R - Franic Chollet, J.J. Allaire](https://www.manning.com/books/deep-learning-with-r)
 
 
-## modules
+## Modules
 
 | Week/Module | Tasks |
 | ----------- | ----------- |
@@ -43,4 +43,15 @@ Notebooks, Materials, Notes &amp; Projects for CSC532
 curves  Resampling (bootstrap, cross validation) Improving Model Performance  Hyper-parameter tuning Battling overfitting with Regularization Lasso, Ridge, dropout for neural networks  Model Ensemble Bagging, Random Forest  Boosting (Ada Boost, Gradient Boosted Trees) | Weeks 11&12 quiz , assignment 5, Discussion 4. | 
 | 13 & 14  Unsupervised Learning  Dimensionality Reduction PCA Auto-encoder Sparse Data Embeddings Clustering Kmeans | Week 13&14 quiz | 
 | 15  No Lecture, Work on Final Project | Final Project |
+
+
+---
+
+## File Structure
+
+- R - "R project folders"
+- Modules - "Module Weekly notes"
+- Textbooks - "PDF Notebook copies"
+
+
 
