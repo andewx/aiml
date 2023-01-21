@@ -37,6 +37,14 @@
 
 - Complementary Events - The set of outcomes in the sample space that were not present for a particular event "E".
 
+### Conditional Probability (Bayesian)
+- P(B | A) = Probability of B occurs after event A has already occurred. (A occuring adds information if B and A exist within the same system.
+- Dependent events the probability of both occuring is P(A & B) = P(A) * P (B | A)
+- By reordering P(B | A) = P(B & A) * (1/P(A)
+- But if they are independent events.
+- P ( B | A ) = P( B)
+- And P(B & A) = P(A) * P(B)
+
 ### Measures of Central Tendency
 - Mean - Central average of a set of sample values or the population average
 - Median - The central point in an ordered set (it's value)
