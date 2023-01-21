@@ -182,10 +182,10 @@ o = std deviation
 ### Hypothesis Testing
 - We have two hypothesis classes: (null hypothesis / alternative)
 - If we introduce a variable or change in the environment will our parameters be affected?
-> Null Hypothesis - Little effect on the statistics/parameters
-> Alternative Hypothesis - Statistics/parameters are effected by the change of variable(s) and there is correlation
-> Type 1 Error - Reject Null Hypothesis, but its true
-> Type 2 Error - Accept Null Hypothses but its false
+- Null Hypothesis - Little effect on the statistics/parameters
+- Alternative Hypothesis - Statistics/parameters are effected by the change of variable(s) and there is correlation
+- Type 1 Error - Reject Null Hypothesis, but its true
+- Type 2 Error - Accept Null Hypothses but its false
 -Critical value seperates when a change in variable affects the data set and when it doesnt. Tells us which hypothesis is valid. 
 - Researcher chooses criteria (0.01%) also called P value. 
 - P value is the area under the standard normal distribution. 
