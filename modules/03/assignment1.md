@@ -6,7 +6,7 @@
 
 ### Clarifying Categorical Distributions:
 ```
-his imprecise usage stems from the fact that it is sometimes convenient to express the outcome of a categorical distribution as a "1-of-K" vector (a vector with one element containing a 1 and all other elements containing a 0) rather than as an integer in the range 1 to K; in this form, a categorical distribution is equivalent to a multinomial distribution for a single observation (see below).
+It is sometimes convenient to express the outcome of a categorical distribution as a "1-of-K" vector (a vector with one element containing a 1 and all other elements containing a 0) rather than as an integer in the range 1 to K; in this form, a categorical distribution is equivalent to a multinomial distribution for a single observation (see below).
 ```
 From [Categorical Distribution](https://en.wikipedia.org/wiki/Categorical_distribution)
 
