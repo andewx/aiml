@@ -1,0 +1,518 @@
+---
+title: "Group 10 - Assignment 1 Notebook"
+output: html_notebook
+---
+
+## Project Members:
+- Sarath Gentela
+- Vamshi Konduri
+- Laxmi Sandumalla
+- Brian Anderson
+
+This notebook is a summary notebook for Assignment 01 which uses the
+*vegashotels*, *california-housing*, and *UCI Heart Disease* datasets
+these data sets can be found:
+[Vegas Hotels](https://archive.ics.uci.edu/ml/datasets/Las%2BVegas%2BStrip)
+[California Housing](https://www.kaggle.com/camnugent/california-housing-prices)
+[UCI Heart Disease](https://archive.ics.uci.edu/ml/datasets/heart+disease)
+
+Students answers will generally be included in blockquote sections
+
+Please run the following command for gmodels integration for CrossTable support. 
+If gmodels is not installed please run 
+
+```{R, eval=T}
+install.packages("gmodels")
+```
+And now run to load the extension
+```{R, eval=T}
+library(gmodels)
+```
+
+Also we would like to have the appropriate filepath prefix
+
+```{R, eval=T}
+
+filepath_prefix = paste(getwd(), "/data/", sep="")
+print(filepath_prefix)
+```
+
+# Problem 1 - Vegas Hotels Dataset
+*Explore the vegas hotel dataset*
+
+**1 - Explore the overall structure of the dataset using `str()`. When you read the data,
+set `StringAsFactors=True` to let R convert String variables to factors.**
+
+```{R, eval=T}
+filename = paste(filepath_prefix, "vegashotels-1.csv", sep="")
+print(filename)
+data_frame = read.csv(filename,sep=";", stringsAsFactors=TRUE, header=TRUE, strip.white=TRUE)
+str(data_frame)
+```
+
+
+
+**2- Are there any missing values?**
+```{R}
+count = sum(is.na(data_frame))
+cat("The overall data-frame is missing : ",count, "values\n")
+```
+
+**3 - Draw a histogram of the score variables. Interpret the histogram**
+
+```{R, echo=T, eval=T}
+hist(data_frame$Score, main="Histogram of score values", xlab="Score(1-5)")
+```
+> *Histogram shows frequency of scores, which also indicates the general distribution Our distribution is left skewed with the mean to the right of the median*
+
+**4 - Find the mode of score**
+
+```{R}
+score_table = table(as.vector(data_frame$Score))
+mod = names(score_table)[score_table == max(score_table)]
+cat("Mode of the scores is : ", mod, "\n")
+```
+
+
+**5 -  Use the quantile function to get quantiles for score, what is the median of score**
+
+```{R}
+q_str = quantile(data_frame$Score, seq(from = 0, to = 1, by =0.25))
+cat("Quantiles: ", q_str, "\n")
+cat("Median: ", q_str[2], "\n")
+```
+
+
+**6 -  Use the ifelse function pass in a factor variable sentiment of "positive" or "negative" take a summary of sentiment to make sure the frequencies of the categories are consistent with the values of score. e.g. positive sentimment should be equal to the frequency of 4 and 5 for Score**
+
+```{R}
+sentiment = as.factor(ifelse(data_frame$Score >= 4, "positive", "negative"))
+positive_scores = data_frame$Score[data_frame$Score >=4]
+cat("Postive Scores: ", length(positive_scores), "\n")
+summary(sentiment)
+```
+
+**7 - Use stat tests and plots to determine if sentiment is associated with Variables pool, gym, Free.Internet, Period.of.Stay, traverler.type, hotel.stars. using an alpa of 0.01.**
+
+> Note that we are looking at primarily bivariate categorical variables so we will use mosaic plots and chi-sq 
+tests to determine the statistical significance of each category with the sentiment.
+
+### Generate the tables
+```{R, eval=T}
+mosaic_pool = table(sentiment, data_frame$Pool)
+mosaic_gym = table(sentiment, data_frame$Gym)
+mosaic_int = table(sentiment, data_frame$Free.internet)
+mosaic_stay = table(sentiment,data_frame$Period.of.stay)
+mosaic_type = table(sentiment, data_frame$Traveler.type)
+mosaic_star = table(sentiment,data_frame$Hotel.stars)
+```
+
+### Generate mosaic plots for each bivariate category variable test
+
+```{R, echo=T, eval=T}
+mosaicplot(mosaic_pool, xlab="Sentiment", ylab="Pool", main="Pool/Sentiment", shade=TRUE)
+```
+```{R eval=T, echo=T, message=FALSE, warning=FALSE}
+mosaicplot(mosaic_gym, xlab="Sentiment", ylab="Gym", main="Gym/Sentiment", shade=TRUE)
+```
+```{R, echo=T, eval=T}
+mosaicplot(mosaic_int, xlab="Sentiment", ylab="Internet", main="Internet/Sentiment", shade=TRUE)
+```
+```{R, echo=T, eval=T}
+mosaicplot(mosaic_stay, xlab="Sentiment", ylab="Stay Length", main="Stay/Sentiment", shade=TRUE)
+```
+```{R, echo=T, eval=T}
+mosaicplot(mosaic_type, xlab="Sentiment", ylab="Type", main="Type/Sentiment", shade=TRUE)
+```
+```{R, echo=T, eval=T}
+mosaicplot(mosaic_star, xlab="Sentiment", ylab="Hotel Stars", main="Stars/Sentiment", shade=TRUE)
+```
+
+### Evaluate the Chi-Sq Distributions
+*Use cross tables to evalute each chi-sq distribution*
+```{R}
+cross_pool = CrossTable(sentiment, data_frame$Pool, chisq=TRUE)
+```
+```{R}
+cross_gym = CrossTable(sentiment, data_frame$Gym, chisq=TRUE)
+```
+```{R}
+cross_int = CrossTable(sentiment, data_frame$Free.internet, chisq=TRUE)
+```
+```{R}
+cross_stay = CrossTable(sentiment,data_frame$Period.of.stay, chisq=TRUE)
+```
+```{R}
+cross_type = CrossTable(sentiment, data_frame$Traveler.type, chisq=TRUE)
+```
+```{R}
+cross_star = CrossTable(sentiment,data_frame$Hotel.stars, chisq=TRUE)
+```
+
+
+> *The following correlations could be inferenced from the Bivariate Categorical Analysis*
+
+> *Sentiment/Hotel Stars: The less stars the more likely it was that a review would display a negative sentiment feature by mosaic plot residuals. Rejection of null hypothesis with p-value 0.00000039 indicates association* 
+
+> *Sentiment/Pool: Shows a positive residuals in the presence of NO pool and negative review association. P-Value 0.0001 indicates potential for association*
+
+> *Sentiment/Gym: P-value 0.95 with no mosaic residuals. Assume no correlation*
+
+>*Sentiment/Internet: Mosaic residual is positive for NO internet and negative reviews. P-Valiue of 0.0021 suggests correlation*
+
+> *Sentiment/Period of Stay: No mosaic residuals/ P-Value = 0.35 accept null hypothesis*
+
+> *Sentiment/Traveler Type: No residuals / P-Value = 0.6 accept null hypothesis*
+
+---
+
+
+# Problem 2 - California Housing Dataset
+> Explore the California Housing Dataset, please note that this assumes some of the header R code sections have been run such as getting and setting filepath headers an loading any libraries.
+
+```{R}
+filename = paste(filepath_prefix, "housing-1.csv", sep="")
+print(filename)
+data_frame <- read.csv(filename,sep=",", stringsAsFactors=TRUE, header=TRUE, strip.white=TRUE)
+```
+
+
+**1- (0.5 pt) Explore the structure of dataset. How many numerical and categorical attributes are there in the dataset**
+
+```{R}
+str(data_frame)
+```
+
+> Here we just read off 10 Variables with 9 Numerical and 1 Categorical
+
+**2- (0.5 pt) Take a summary statistics of the dataset.Does any of the variables have missing values?**
+```{R}
+print(summary(data_frame))
+```
+
+ > Housing summary shows 207 missing values attributed to bedrooms missing values
+
+**3- (0.5 pt) What percentage of the rows have missing values in one or more variables? You can use the function “complete.cases” to get a logical vector indicating whether each row is complete (has no missing value) or incomplete (has one or more missing values). Run ?complete.cases to get help on this function in R. Use the logical vector returned by complete.cases to count the number of incomplete cases.**
+
+```{R}
+missing = length(which(complete.cases(data_frame) == FALSE))
+percent = missing/length(data_frame$longitude)
+cat("Percent missing: ", percent*100, "%\n")
+```
+
+
+**4- (0.5 pt) Remove the rows with missing values. You can use either “complete.cases” function or “na.omit” function for this purpose. Run ?na.omit in R to get help on these functions and to see some examples.**
+```{R}
+data_frame <- na.omit(data_frame)
+```
+
+**5- (0.5 pt) Draw a histogram and boxplot of the median_house_value. What can you say about the shape of median_house_value? Is the median_house_value sample positively skewed, symmetric, or negatively skewed?**
+```{R}
+hist(data_frame$median_house_value, xlab="median house value", ylab="frequency", main="Median house value histogram")
+```
+```{R}
+boxplot(data_frame$median_house_value, ylab="Median house price range", main="Median House Value Boxplot")
+```
+
+> Histogram shows a right skewed guassian distribution and boxplot is not showing outliers
+
+
+**6- (0.5 pt)Use Q-Q plot to examine if the distribution of median_house_value is approximately normal?**
+```{R}
+qqnorm(data_frame$median_house_value, main="Distribution of Median House Values relative to normal distributions")
+```
+
+> Q-Q plot is quasi-normal while samples past the second std deviation of normal distribution shows a flat line indicating right skewedness of the sample data. Therefore we can say that the distribution is relatively right skewed and normal.
+
+
+**7- (0.5 pt) Use IQR method to find outliers of the median_house_value attribute. How many outliers does this attribute have?**
+
+```{R}
+IQR <- IQR(data_frame$median_house_value)
+left <- 119600 - 1.5*IQR
+right <- 264725 + 1.5*IQR
+x <- data_frame$median_house_value
+outliers = x[x < left | x > right]
+cat("Median House Value Outliers Length: ", length(outliers), "\n")
+```
+
+
+**8- (1 pt) Does any of the numerical attributes have a positive/negative linear correlation with median_house_value? Use scatter plots and correlation matrix t answer this question.**
+
+```{R}
+attributes = data_frame[,c("median_house_value", "longitude", "latitude", "housing_median_age", "total_rooms", "total_bedrooms", "population", "households", "median_income")]
+pairs(attributes)
+```
+
+ > Median house values show postive weak correlations with the following numerical values. No negative trends observed
+ 1) Median Income, Total Rooms, Total Bedrooms Show weak positive relationship
+ 2) Latitude and longitude show potential for non-linear periodic relations (Paramteric shapes)
+ 
+ Show correlation matrices
+```{R}
+cor(attributes)
+```
+
+ > Correlation Matrix shows a positive correlation with median income while other correlations remain relatively low and somewhat negative.
+
+**9- (0.5 pt) Is there a statistically significant difference between the mean of meadian_house_valueacross different levels of ocean_proximity ? Use an appropriate plot and statistical test (with significance level alpha=0.01) to answer this question**
+
+```{R}
+print(oneway.test(median_house_value~ocean_proximity, data=data_frame))
+```
+ >The mean of the median house values variate significantl;y across levels of  ocean proximity with p-values < 0.0000000000000002.
+
+**10- (0.5 pt) Use ifelse function to create a new factor variable “Is_Inland” which takes the value “Yes” if the ocean_proximity is “Inland” and No” otherwise.**
+```{R}
+Is_Inland = as.factor(ifelse(data_frame$ocean_proximity == "INLAND", "Yes", "No"))
+```
+
+**11- (0.5 pt) Use side by side box plot to visualize the relationship between “Is_Inland” and “medianouse_value”. Is there a significant difference between the means of median_house_value for Inland vs not Inland houses? Use an appropriate statistical test to answer this question ( use significance level alpha=0.01)**
+
+```{R}
+attach(data_frame)
+plot(median_house_value~Is_Inland, col="red")
+print(t.test(median_house_value~Is_Inland, alternative="two.sided"))
+```
+
+ >The side by side box plot shows a clear statistical difference in median house value due to ocean proximity with inland houses showing a much lower house value while p value also show the statistical significance associated with the inland categorical variable.
+
+---
+
+# Problem 3 - UCI Heart Disease Dataset
+> Explore the UCI Heart Disease dataset
+
+*Opens all files*
+```{R}
+file01 = paste(filepath_prefix , "processed.cleveland.data", sep="")
+file02 = paste(filepath_prefix  , "processed.hungarian.data", sep="")
+file03 = paste(filepath_prefix  , "processed.switzerland.data", sep="")
+file04 = paste(filepath_prefix  , "processed.va.data", sep="")
+
+
+header = c("age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num")
+
+cleveland_data = read.csv(file01, sep=",", header=FALSE, na.strings="?",col.names=header)
+hungarian_data = read.csv(file02, sep=",", header=FALSE, na.strings="?", col.names=header)
+switzerland_data = read.csv(file03, sep=",", header=FALSE, na.strings="?",col.names=header)
+va_data = read.csv(file04, sep=",", header=FALSE, na.strings="?", col.names=header)
+```
+ 
+**1. (0.5pt) Open these files and examine the data in them. Note that the files do not have a header and the  missing values are marked by “?” character. Each file contains the 14 attributes described here. Load each file to a dataframe ( remember to set na.string=”?” so that “?” is recognized as missing not a data value).**
+
+```{R}
+print(str(cleveland_data))
+```
+```{R}
+print(str(hungarian_data))
+```
+```{R}
+print(str(switzerland_data))
+```
+```{R}
+print(str(va_data))
+```
+
+**2. (0.5 pt) Use rbind  function to combine the four dataframes into one dataframe and manually set the column names  using colnames function. The name of each column/attribute is described here.**
+
+```{R}
+data_frame <- rbind(cleveland_data, hungarian_data, switzerland_data, va_data)
+colnames(data_frame) <- header
+```
+
+
+**3. (0.5pt) Explore the overall structure of the dataset. What percentage of rows have missing values in one or more attributes?**
+
+```{R}
+len = nrow(data_frame)
+missing = data_frame[rowSums(is.na(data_frame)) > 0,]
+percent = nrow(missing)/nrow(data_frame)
+cat("Percent missing: ", percent*100, "%\n")
+```
+
+
+**4. (1pt) Read the data description carefully. Decide which attributes are categorical and convert them to “factor”  using factor function ( set the “labels” option to give meaningful names/labels to each level)**
+
+```{R}
+sex_lab = c("FEMALE", "MALE")
+sex_lev = c(0,1)
+cp_lab = c("TYPICAL", "ATYPICAL", "NON_ANGINAL", "ASYMP")
+cp_lev = c(1,2,3,4)
+ecg_lab = c("NORMAL", "ST-ABNORMAL", "L-HYPERTROPY")
+ecg_lev = c(0,1,2)
+exang_lab = c("NO", "YES")
+exang_lev = c(0,1)
+thal_lab = c("NORMAL", "DEFECT", "REV_DEFECT")
+thal_lev = c(3,6,7)
+data_frame$sex = factor(x=data_frame$sex, labels=sex_lab, levels=sex_lev)
+data_frame$cp = factor(x=data_frame$cp, labels=cp_lab, levels=cp_lev)
+data_frame$restecg = factor(x=data_frame$restecg, labels=ecg_lab, levels=ecg_lev)
+data_frame$exang = factor(x=data_frame$exang, labels=exang_lab, levels=exang_lev)
+data_frame$thal = factor(x=data_frame$thal, labels=thal_lab, levels=thal_lev)
+```
+
+
+ 
+**5. (0.5 pt) What is the median and mode of the age attribute.**
+```{R}
+print(summary(data_frame$age)) 
+ages = table(as.vector(data_frame$age))
+mod = as.numeric(names(ages)[ages == max(ages)])
+med = median(data_frame$age)
+
+cat("Mode of age: " , mod, "\n")
+cat("Median of age: ",med, "\n")
+```
+
+
+**6. (0.5 pt) Are female patients under-represented  compared to male patients in this dataset?**
+
+```{R}
+fems = data_frame$sex[data_frame$sex=="FEMALE"]
+perc_f = length(fems)/len*100
+cat("Female Percentage: ", perc_f, "percent\n")
+```
+
+> Female patients : 21% - Under-represented
+
+**7. (0.5 pt) Use “ifelse” and “factor” functions to create a new factor variable (call it  “diagnosis”) which takes the value “No” if column 14 has the value zero and “Yes” otherwise.  Replace column 14 of your dataframe with this new variable.**
+
+```{R}
+data_frame$diagnosis = ifelse(data_frame$num > 0,"Yes", "No")
+data_frame$diagnosis = as.factor(data_frame$diagnosis)
+print("UCI Dataset Summary")
+print(str(data_frame))
+```
+
+
+**(4 pts) Explore the relationship between “diagnosis” variable and all other 13 attributes in the dataset.  Which variables are associated with “diagnosis” use appropriate plots and statistical tests to answer this  question. (Note to get full credit for this question, you should use both an appropriate plot and an appropriate statistics test to examine the relationship between each of these variables and sentiment. You should also interpret each plot). Please refer to the lectures to see what type of statistical test and plot you need to use for bivariate analysis based on the type of variables. **
+
+
+ *Factor Variables: ("diagnosis", "sex", "cp", "restecg", "exang", "thal", "num")*
+ *Numerical: ("num" age, trestbps, chol, fbs, thalach, oldpeak, slop, ca)*
+
+Run this to produce cleaned data **(if desired)**
+```{R, eval=F}
+data_frame = na.omit(data_frame)
+print("Cleaned Data Frame Rows Length: ")
+print(nrow(data_frame))
+```
+
+### Numerical vs. Numerical Relationships Correlations and Scatterplots.
+
+*Scatterplot and Correlation Matrix Using the Num (Numerical Diagnosis)*
+```{R}
+numerical_attributes = data_frame[,c("num","age", "trestbps", "chol", "fbs", "thalach", "oldpeak", "slope", "ca")]
+pairs(numerical_attributes)
+```
+```{R}
+print("Correlation Matrix for Numerical Variables for Households")
+cor(numerical_attributes)
+```
+
+ > Numerical plots - Most variables seem to be fixed or have weak correlations. Here we just tried
+ to visualize any relationships between the num variable and all other numerical factors Num should be an ordered variable but we see a wide dispersion for most attributes.Here are notable relations:
+
+ > num~thalach: broad negative correlation with maximum heart rate achieved. (weak): -0.41
+ > num~age: broad positive correlation (weak): +0.22
+ > num~chol: broad positive correlation (weak) +0.06
+ > num~oldpeak: broad positive correlation (weak): +0.50
+ > num~restbps: broad positive correaltions (weak): +.15
+ 
+ > *We have ommitted data sparse slope, ca, fbs*
+
+
+### Categorical vs Numerical Relationships
+
+```{R}
+plot(data_frame$age~data_frame$diagnosis, col="red")
+```
+
+ >Positive diagnosis shows that Yes profiles correlates with increased age indicated by increased quartiles and median age for yes diagnosis
+ 
+```{R}
+plot(data_frame$thalach~data_frame$diagnosis, col="blue")
+```
+> A positive diagnosis shows range profiles, Q1,Q3, median associated with lower (negative thalach)
+
+```{R}
+plot(data_frame$chol~data_frame$diagnosis, col="purple")
+```
+> Chol shows equivlant median and outliers for No diagnosis. Q3 ranges similar and Q1 is compromised  data_clean shows near equivlancy
+
+```{R}
+plot(data_frame$oldpeak~data_frame$diagnosis, col="orange")
+```
+> Shows higher quartile ranges for positive diagnosis and higher oldpeak values.
+
+```{R}
+plot(data_frame$trestbps~data_frame$diagnosis, col="magenta")
+```
+> *Data plots are nearly equivlant for trestbps and diagnosis*
+
+*Now use two sample test for Numerical-Categorical comparison with diagnosis*
+
+```{R, echo=F}
+print(t.test(data_frame$age~data_frame$diagnosis), alternative="two.sided") 
+print(t.test(data_frame$thalach~data_frame$diagnosis), alternative="two.sided") 
+print(t.test(data_frame$oldpeak~data_frame$diagnosis), alternative="two.sided") 
+print(t.test(data_frame$trestbps~data_frame$diagnosis), alternative="two.sided")
+print(t.test(data_frame$chol~data_frame$diagnosis), alternative="two.sided") 
+print(t.test(data_frame$slope~data_frame$diagnosis), alternative="two.sided") 
+print(t.test(data_frame$ca~data_frame$diagnosis), alternative="two.sided")  
+print(t.test(data_frame$fbs~data_frame$diagnosis), alternative="two.sided")
+```
+
+> Tests show All samples here are correlated to some degree by p-values given implying statistical significance
+
+
+### Bivariate Categorical Analysis
+*Factor Variables: ("diagnosis", "sex", "cp", "restecg", "exang", "thal", "num")*
+*Create the mosaic tables*
+```{R}
+diag_sex <- table(data_frame$diagnosis, data_frame$sex)
+diag_cp <- table(data_frame$diagnosis, data_frame$cp)
+diag_restecg <- table(data_frame$diagnosis, data_frame$restecg)
+diag_exang <- table(data_frame$diagnosis, data_frame$exang)
+diag_thal <- table(data_frame$diagnosis, data_frame$thal)
+```
+
+```{R}
+mosaicplot(diag_sex, xlab="diagnosis", ylab="sex", main="Diagnosis Sex", shade=TRUE)
+```
+```{R}
+mosaicplot(diag_cp, xlab="diagnosis", ylab="cp", main="Diagnosis cp", shade=TRUE)
+```
+```{R}
+mosaicplot(diag_restecg, xlab="diagnosis", ylab="restecg", main="Diagnosis RestECG", shade=TRUE)
+```
+```{R}
+mosaicplot(diag_exang, xlab="diagnosis", ylab="exang", main="Diagnosis EXANG", shade=TRUE)
+```
+```{R}
+mosaicplot(diag_thal, xlab="diagnosis", ylab="thal", main="Diagnosis THAL", shade=TRUE)
+```
+
+> Sex shows negative correlation for diagnosis with females (positive for males) although data sample bias is present. 
+
+> Thal shows a strong negative residual where normal thal is indicative of a No diganosis and  reversable defects are associated with positive diagnosis.
+
+> Chest pain residuals overwhelmingly indicate positive residuals in asymptomatic cases. While atypical and nonanginal  show negative residuals 
+
+> Exang, excercise induced angina showed strong residuals with exang presence indicative of
+ diagnosis and vice versa.
+ 
+ >Chisq analysis shows p-values indicating statistical significance for the following categories. (sex, cp, restecg, exang, thal). All categories with rest ecg being the least significant
+ 
+ **Generate ChiSq Tests**
+
+```{R, echo=T}
+chisq.test(data_frame$diagnosis, data_frame$sex)
+chisq.test(data_frame$diagnosis, data_frame$cp)
+chisq.test(data_frame$diagnosis, data_frame$restecg)
+chisq.test(data_frame$diagnosis, data_frame$exang)
+chisq.test(data_frame$diagnosis, data_frame$thal)
+```
+
+
+
