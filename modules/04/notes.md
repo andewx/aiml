@@ -4,7 +4,7 @@
 ---
 - k-NN classifier works by using labeled training data exposing classes. Associates a sampled vector $p$ with pre-associated vector class $q$ using a distance function, often Euclidian. $$dist(p,q) = {sqrt(\sum_{i=0}^N(p_i - q_i)^2}$$
 - k parameter indicates number of nearest distance samples to take for class identification. Class association is based on count of class associations.
-$C_p=\sum_1^k(1*P)$ where class Class `p`  recieves the sum of all closest associated `P` items that were nearest to the sample vector `X`. In another words the class with the greatest associated **votes** becomes the associated k-NN class.
+$C_p=\sum_{1}^n(1*P)$ for all classes of P that are evaluated as a k nearest neighbor.  Class $C_p$ recieves the sum of all closest associated `P` items that were nearest to the sample vector `X`. In another words the class with the greatest associated **votes** becomes the associated k-NN class.
 
 ### Choosing an appropriate k
 
@@ -34,14 +34,14 @@ Higher quality data sets with sufficient examples make the `k` choice less sensi
 
 We need to normalize data so that distance metrics are equivilant between vector parameters. (Non-Weighted Parameters)
 
-This is traditionally called **min-max normalization** which transforms numerical data to fall in ranges between 0 - 1. 
+This is traditionally called **min-max normalization** which transforms numerical data to fall in ranges between 0 - 1.
 
 We need to choose a min and a max for the parameter 'q'
 
-$$ q_new = {(q-min(q)/(max(q)-min(q)))} $$
+$$ q_new = \frac{q-min(q}{max(q)-min(q)} $$
 
 Which fits the value into its explicit range.
 
 We also have **z-score standardizatin** which utilize the **mean** and **standard deviation**  of the sampled value. Works when no range is available or range is infinity.
 
-$$ q_new = {(q-mu)/(phi)} $$ where $mu$ is the mean and $phi$ is the standard deviation.
+$$ q_new = {(q-\mu)/(\phi)} $$ where $mu$ is the mean and $phi$ is the standard deviation.
