@@ -44,4 +44,101 @@ Which fits the value into its explicit range.
 
 We also have **z-score standardization** which utilize the **mean** and **standard deviation**  of the sampled value. Works when no range is available or range is infinity.
 
-$$q_{new} = \frac{q-\mu}{\phi}$$ where $mu$ is the mean and $phi$ is the standard deviation.
+$$q_{new} = \frac{q-\mu}{\phi}$$ where $\mu$ is the mean and $\phi$ is the standard deviation.
+
+**Handling Nominal Data**
+
+Handles nominal data by using **dummy coding**. That is convert the nominal values to values of 1 and 0.
+
+`n-category` mutually exclusive variables are created with binary indicator variables for `(n-1)` levels of the categorical feature.
+
+That is a level is signaled through **one-hot-encoding**.
+
+Distances between features is always one or zero so no additional transformations are required.
+
+## Why is k-NN lazy
+
+No abstraction/generalization occurs. Lazy learners are not learning anything, they are just classifying.
+
+Heavy reliance on training instances rather than an abstracted model,  is known as **instance-based learning** or **rote-learning**
+
+No model is built and k-NN is said to be a class of **non-parametric** learning methods. No model is built.
+
+## Handling k-NN datasets in R
+
+**Load data**
+```
+df <- read.csv("wisc_bc_data.csv", stringsAsFactors=FALSE)
+df <- df[-1] # drops the first column (id)
+df$diagnosis <- factor(df$diagnosis, levels=c("B","M"), labels=c("Benign", "Malignant"))
+```
+
+**Transforming Data**
+
+Range Normalize
+
+```
+normalize <- function(x){
+  return ((x-min(x))/(max(x)-min(x)))
+}
+```
+
+Use `lapply()` to normalize all numeric rows of the data frame this applies to function argument to the argument x
+
+**Create normalized data frame**
+```
+df_n <- as.data.frame(lapply(df[2:31], normalize))
+```
+**Create training and test data sets**
+```
+df_train <- df_n[1:469,]
+df_test <- df_n[470:569,]
+```
+
+We excluded the variable `diagnosis` from the normalized test/train sets.
+
+```
+df_train_labels <- df[1:469,1]
+df_test_labels <-[470:569,1]
+```
+
+Takes `diagnosis` in the first column of the `df` and created the vectors `df_train_labels` and `df_test_labels`.
+
+**Train the model**
+
+Install the `class` package
+`install.packages("class")` and `library(class)`
+
+Use  the `knn()` function for a standard knn implementation with Euclid distance.
+
+The function `knn` returns a factor vector of predicted classes for each row in the test data frame
+```
+p <- knn(train, test, cl, k)
+```
+
+So for our set up we can do:
+```
+p <- knn(train=df_train, test=df_test, cl=df_train_labels, k = 21)
+```
+
+**Evaluate**
+Now we can use `CrossTable` to evaluate the performance.
+
+```
+CrossTable(x=df_test_labels, y = p, prop.chisq=FALSE)
+```
+This will show us a truth table of test labels and the test predictions.
+
+**Improving performance**
+
+Might use a **z-score standardization**. For this `R` has a built in `scale()` function
+
+```
+df_z <- as.data_frame(scale(df[-1]))
+```
+
+*For the example test this results in a decrease in accuracy from 98%-95%*
+
+Next we might choose to vary the k value and track the accurracy as a whole.
+
+> To generalize you might  you might create several sets of 100 patients and retest
