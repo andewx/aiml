@@ -16,6 +16,8 @@ these data sets can be found:
 [California Housing](https://www.kaggle.com/camnugent/california-housing-prices)
 [UCI Heart Disease](https://archive.ics.uci.edu/ml/datasets/heart+disease)
 
+Current R notebook assumes that workspace directory is set to the root of the project folder and that all data files exist in a /data subdirectory folder
+
 Students answers will generally be included in blockquote sections
 
 Please run the following command for gmodels integration for CrossTable support. 
@@ -79,14 +81,14 @@ cat("Mode of the scores is : ", mod, "\n")
 ```{R}
 q_str = quantile(data_frame$Score, seq(from = 0, to = 1, by =0.25))
 cat("Quantiles: ", q_str, "\n")
-cat("Median: ", q_str[2], "\n")
+cat("Median: ", median(data_frame$Score), "\n")
 ```
 
 
 **6 -  Use the ifelse function pass in a factor variable sentiment of "positive" or "negative" take a summary of sentiment to make sure the frequencies of the categories are consistent with the values of score. e.g. positive sentimment should be equal to the frequency of 4 and 5 for Score**
 
 ```{R}
-sentiment = as.factor(ifelse(data_frame$Score >= 4, "positive", "negative"))
+data_frame$sentiment = as.factor(ifelse(data_frame$Score >= 4, "positive", "negative"))
 positive_scores = data_frame$Score[data_frame$Score >=4]
 cat("Postive Scores: ", length(positive_scores), "\n")
 summary(sentiment)
@@ -99,12 +101,12 @@ tests to determine the statistical significance of each category with the sentim
 
 ### Generate the tables
 ```{R, eval=T}
-mosaic_pool = table(sentiment, data_frame$Pool)
-mosaic_gym = table(sentiment, data_frame$Gym)
-mosaic_int = table(sentiment, data_frame$Free.internet)
-mosaic_stay = table(sentiment,data_frame$Period.of.stay)
-mosaic_type = table(sentiment, data_frame$Traveler.type)
-mosaic_star = table(sentiment,data_frame$Hotel.stars)
+mosaic_pool = table(data_frame$sentiment, data_frame$Pool)
+mosaic_gym = table(data_frame$sentiment, data_frame$Gym)
+mosaic_int = table(data_frame$sentiment, data_frame$Free.internet)
+mosaic_stay = table(data_frame$sentiment,data_frame$Period.of.stay)
+mosaic_type = table(data_frame$sentiment, data_frame$Traveler.type)
+mosaic_star = table(data_frame$sentiment,data_frame$Hotel.stars)
 ```
 
 ### Generate mosaic plots for each bivariate category variable test
@@ -130,35 +132,24 @@ mosaicplot(mosaic_star, xlab="Sentiment", ylab="Hotel Stars", main="Stars/Sentim
 
 ### Evaluate the Chi-Sq Distributions
 *Use cross tables to evalute each chi-sq distribution*
-```{R}
-cross_pool = CrossTable(sentiment, data_frame$Pool, chisq=TRUE)
-```
-```{R}
-cross_gym = CrossTable(sentiment, data_frame$Gym, chisq=TRUE)
-```
-```{R}
-cross_int = CrossTable(sentiment, data_frame$Free.internet, chisq=TRUE)
-```
-```{R}
-cross_stay = CrossTable(sentiment,data_frame$Period.of.stay, chisq=TRUE)
-```
-```{R}
-cross_type = CrossTable(sentiment, data_frame$Traveler.type, chisq=TRUE)
-```
-```{R}
-cross_star = CrossTable(sentiment,data_frame$Hotel.stars, chisq=TRUE)
-```
 
-
+```{R}
+chisq.test(data_frame$sentiment, data_frame$Pool)
+chisq.test(data_frame$sentiment, data_frame$Gym)
+chisq.test(data_frame$sentiment, data_frame$Free.internet)
+chisq.test(data_frame$sentiment, data_frame$Hotel.stars)
+chisq.test(data_frame$sentiment, data_frame$Traveler.type)
+chisq.test(data_frame$sentiment, data_frame$Period.of.stay)
+```
 > *The following correlations could be inferenced from the Bivariate Categorical Analysis*
 
-> *Sentiment/Hotel Stars: The less stars the more likely it was that a review would display a negative sentiment feature by mosaic plot residuals. Rejection of null hypothesis with p-value 0.00000039 indicates association* 
+> *Sentiment/Hotel Stars: The less stars the more likely it was that a review would display a negative sentiment feature by mosaic plot residuals. Rejection of null hypothesis with p-value 0.00000039 indicates statistical significance* 
 
-> *Sentiment/Pool: Shows a positive residuals in the presence of NO pool and negative review association. P-Value 0.0001 indicates potential for association*
+> *Sentiment/Pool: Shows a positive residuals in the presence of NO pool and negative review association. P-Value < 0.00036 indicates potential for association*
 
 > *Sentiment/Gym: P-value 0.95 with no mosaic residuals. Assume no correlation*
 
->*Sentiment/Internet: Mosaic residual is positive for NO internet and negative reviews. P-Valiue of 0.0021 suggests correlation*
+> *Sentiment/Internet: Mosaic residual is positive for NO internet and negative reviews. P-Valiue of 0.0021 suggests correlation*
 
 > *Sentiment/Period of Stay: No mosaic residuals/ P-Value = 0.35 accept null hypothesis*
 
@@ -258,9 +249,9 @@ cor(attributes)
 **9- (0.5 pt) Is there a statistically significant difference between the mean of meadian_house_valueacross different levels of ocean_proximity ? Use an appropriate plot and statistical test (with significance level alpha=0.01) to answer this question**
 
 ```{R}
-print(oneway.test(median_house_value~ocean_proximity, data=data_frame))
+oneway.test(median_house_value~ocean_proximity, data=data_frame)
 ```
- >The mean of the median house values variate significantl;y across levels of  ocean proximity with p-values < 0.0000000000000002.
+ >Significant statistical difference between means. Ocean proximity results in p-values < 0.0000000000000002 indicating statistical significance
 
 **10- (0.5 pt) Use ifelse function to create a new factor variable “Is_Inland” which takes the value “Yes” if the ocean_proximity is “Inland” and No” otherwise.**
 ```{R}
@@ -272,7 +263,7 @@ Is_Inland = as.factor(ifelse(data_frame$ocean_proximity == "INLAND", "Yes", "No"
 ```{R}
 attach(data_frame)
 plot(median_house_value~Is_Inland, col="red")
-print(t.test(median_house_value~Is_Inland, alternative="two.sided"))
+t.test(median_house_value~Is_Inland, alternative="two.sided")
 ```
 
  >The side by side box plot shows a clear statistical difference in median house value due to ocean proximity with inland houses showing a much lower house value while p value also show the statistical significance associated with the inland categorical variable.
@@ -318,6 +309,7 @@ print(str(va_data))
 ```{R}
 data_frame <- rbind(cleveland_data, hungarian_data, switzerland_data, va_data)
 colnames(data_frame) <- header
+head(data_frame)
 ```
 
 
@@ -428,7 +420,7 @@ cor(numerical_attributes)
 plot(data_frame$age~data_frame$diagnosis, col="red")
 ```
 
- >Positive diagnosis shows that Yes profiles correlates with increased age indicated by increased quartiles and median age for yes diagnosis
+ >Statistical difference in profiles. Diagnosed heart conditions are associated with increased age indicated by increased quartile values
  
 ```{R}
 plot(data_frame$thalach~data_frame$diagnosis, col="blue")
