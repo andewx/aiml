@@ -38,10 +38,10 @@ This is traditionally called **min-max normalization** which transforms numerica
 
 We need to choose a min and a max for the parameter 'q'
 
-$$ q_new = \frac{q-min(q}{max(q)-min(q)} $$
+$$ q_new = \frac{q-min(q)}{max(q)-min(q)} $$
 
 Which fits the value into its explicit range.
 
-We also have **z-score standardizatin** which utilize the **mean** and **standard deviation**  of the sampled value. Works when no range is available or range is infinity.
+We also have **z-score standardization** which utilize the **mean** and **standard deviation**  of the sampled value. Works when no range is available or range is infinity.
 
-$$ q_new = {(q-\mu)/(\phi)} $$ where $mu$ is the mean and $phi$ is the standard deviation.
+$$q_{new} = \frac{q-\mu}{\phi}$$ where $mu$ is the mean and $phi$ is the standard deviation.
