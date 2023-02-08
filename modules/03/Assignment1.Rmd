@@ -35,6 +35,10 @@ Also we would like to have the appropriate filepath prefix
 
 ```{R, eval=T}
 
+missing <- function(x){
+  return(sum(colSums(is.na(x))))
+}
+
 filepath_prefix = paste(getwd(), "/data/", sep="")
 print(filepath_prefix)
 ```
@@ -56,8 +60,7 @@ str(data_frame)
 
 **2- Are there any missing values?**
 ```{R}
-count = sum(is.na(data_frame))
-cat("The overall data-frame is missing : ",count, "values\n")
+cat("The overall data-frame is missing : ",missing(data_frame), "values\n")
 ```
 
 **3 - Draw a histogram of the score variables. Interpret the histogram**
@@ -91,7 +94,7 @@ cat("Median: ", median(data_frame$Score), "\n")
 data_frame$sentiment = as.factor(ifelse(data_frame$Score >= 4, "positive", "negative"))
 positive_scores = data_frame$Score[data_frame$Score >=4]
 cat("Postive Scores: ", length(positive_scores), "\n")
-summary(sentiment)
+summary(data_frame$sentiment)
 ```
 
 **7 - Use stat tests and plots to determine if sentiment is associated with Variables pool, gym, Free.Internet, Period.of.Stay, traverler.type, hotel.stars. using an alpa of 0.01.**
@@ -179,6 +182,7 @@ str(data_frame)
 **2- (0.5 pt) Take a summary statistics of the dataset.Does any of the variables have missing values?**
 ```{R}
 print(summary(data_frame))
+cat("Dataset is missing: ", missing(data_frame), "values\n")
 ```
 
  > Housing summary shows 207 missing values attributed to bedrooms missing values

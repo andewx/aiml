@@ -1,0 +1,196 @@
+---
+title: "R Notebook"
+author: "Brian Anderson"
+output: html_notebook
+---
+
+
+## Project Members:
+- Sarath Gentela
+- Vamshi Konduri
+- Laxmi Sandumalla
+- Brian Anderson
+
+This notebook is a summary notebook for Assignment 02 which applies a k-Nearest Neighbors classifier to predict income along with Naive Bayes Classifier for sentiment classification.
+
+Nearest Neighbor Income set is from the UCI ML repository located [here](https://archive.ics.uci.edu/ml/machine-learning-databases/adult/)
+
+The tweet repository is from the kaggle repository and located [here](https://www.kaggle.com/kerneler/starter-covid-19-nlp-text-d3a3baa6-e/data)
+
+Current R notebook assumes that workspace directory is set to the root of the project folder and that all data files exist in a /data subdirectory folder
+
+Students answers will generally be included in blockquote sections
+
+Please run the following command for gmodels integration for CrossTable support. 
+If gmodels is not installed please run 
+
+```{R, eval=T}
+install.packages("gmodels")
+install.packages("class")
+install.packages("dplyr")
+```
+And now run to load the extension
+```{R, eval=F}
+library(gmodels)
+library(class)
+library(dplyr)
+```
+Our data is located in the data folder 
+```{R, eval=T}
+filepath = paste(getwd(),"/data/", sep="")
+```
+
+Useful functions
+
+```{R, eval=T}
+#static variable
+numerics = 0
+cats = 0
+
+missing <- function(x){
+  return(sum(colSums(is.na(x))))
+}
+
+vars_numeric <- function(x){
+  numerics <- attr(vars_numeric, "sum_n")
+  if(is.null(numerics)){
+    numerics <- 0
+  }
+ 
+  if(is.numeric(x)){
+    numerics <- numerics + 1
+  }
+  return(numerics)
+}
+
+vars_categorical <- function(x){
+  cats <- attr(vars_categorical, "sum_c")
+  if(is.null(cats)){
+    cats <- 0
+  }
+  if(is.factor(x)){
+    cats <- cats + 1
+  }
+  return(cats)
+}
+
+```
+# Applying k-Nearest Neighbors to predict income
+
+**1. (1pt) Download the dataset and store it in a dataframe in R. The dataset does not have header, you should add the headers manually to your dataframe based on the list of attributes provided in https://archive.ics.uci.edu/ml/datasets/Adult. Also please note that some entries have extra white space. So to read the data properly, use the option strip.white=TRUE in read.csv function.**
+
+```{R, echo=T, eval=T}
+path = paste(filepath,"adult.data",sep="")
+
+header = c("age","workclass", "fnlwgt", "education", "education-num", "marital", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours_per_week", "native_country","income")
+
+
+data_frame = read.csv(path, header=FALSE, sep=",", stringsAsFactors = TRUE, na.strings="?", col.names=header, strip.white=TRUE)
+
+head(data_frame)
+```
+
+**2. (1pt) Explore the overall structure of the dataset using the str() function. Get a summary statistics of each variable. How many categorical and numeric variables you have in your data? Is there any missing values?**
+
+```{R}
+str(data_frame)
+n <- unlist(lapply(data_frame, vars_numeric))
+c <- unlist(lapply(data_frame, vars_categorical))
+cat("Number of variables: ", ncol(data_frame), "\n")
+cat("Number of numerics: ", sum(n), "\n")
+cat("Number of cateogricals: ", sum(c), "\n")
+mis <- missing(data_frame)
+cat("Number of missing values", mis, "\n")
+```
+
+
+**3. (1pt) Get the frequency table of the “income” variable to see how many observations you have in each category of the income variable. Is the data balanced? Do we have equal number of samples in each classof income?**
+```{R}
+table(data_frame$income)
+```
+
+> Clearly we don't have an equal number of samples in each class of income, the data set when sampling incomes >50k may also be looking at outliers in terms of capital_gains profile variable.
+
+**4. (3 pts) Explore the data in order to investigate the association between income and the otherfeatures. Which of the other features seem most likely to be useful in predicting income. **
+
+
+> Income is going to most directly associated with capital_gains. Notably if the link is direct enough, then further analysis on the numerical capital_gain variable can be used for numerical analysis tools
+
+- **To explore the relationship between numerical features and “income” variable, you can use side by side box plot and t.test**
+
+- **To explore the relationship between categorical features and “income” variable, you can use frequency table and chisquare test (note that chisquare test might throw a warning if there are cells whose expected counts in the frequency table is less 5. This warning means the p-values reported from chisquare test may be incorrect due to low counts and are not reliable. You can ignore the warning for this assignment). Based on your data exploration above, decide which attributes you are going to use to predict income.**
+
+- **Explain your reason for selecting these attributes.**
+
+**5. (1 pt) An initial data exploration shows that the missing values in the dataset are denoted by “?” not NA. Change all the “?” characters in the dataframe to NA**
+
+
+**6. (1pt) Use the command colSums(is.na(<your dataframe>) to get the number of missing values in each column of your dataframe. Which columns have missing values?**
+
+**7. (3 pt) There are several ways we can deal with missing values. The easiest approach is to remove all the rows with missing values. However, if a large number of rows have missing values removing them will result in loss of information and may affect the classifier performance. If a large number of rows have missing values, then it is typically better to replace missing data with some values. This is called data imputation. Several methods for missing data imputation exist. The most naïve method (which we will use here) is to replace the missing values with mean of the column (for a numerical column) or mode/majority value of the column (for a categorical column). We will use a more advanced data imputation method in a later module. For now, replace the missing values in a numerical column with the mean of the column and the missing values in a categorical column with the mode/majority of the column. After imputation, use colSums(is.na(<your dataframe>) to make sure that your dataframe no longer has missing values.**
+
+
+
+**8. Set the seed of the random number generator to a fixed integer, say 1, so that I can reproduce your work: `set.seed(1)`**
+
+**9. (1pt) Randomize the order of the rows in the dataset.**
+
+
+**10. (2 pt) This dataset has several categorical variables. With the exception of few models ( such as NaiiveBayes and tree-based models) most machine learning models require numeric features and cannot work directly with categorical data. One way to deal with categorical variables is to assign numeric indices to each level. However, this imposes an artificial ordering on an unordered categorical variable. For example,suppose that we have a categorical variable primary color with three levels: “red”,”blue”,”green”. If we convert “red” to 0 , “blue” to 1 and “green” to 2 then we are telling our model that red < blue< green whichis not correct. A better way to encode an unordered categorical variable is to do one-hot-encoding. In onehot-encoding we create a dummy binary variable for each level of a categorical variable. For example wecan represent the primary color variable by three binary dummy variables, one for each color (red, blue,and green) . If the color is red, then the variable red takes value 1 while blue and green both take the value zero**
+
+**11. (1 pt) Scale all numeric features using Min-Max scaling**
+
+
+**12. (3 pts) Use 5-fold cross validation with KNN to predict the “income” variable and report the cross-validation error. ( You can find an example in slides 51-53 of module 4 lecture notes).**
+
+
+**13. (2 pts) Tune K (the number of nearest neighbors) by trying out different values (starting from k=1 tom k=sqrt(n) where n is the number of observations in the dataset (for example k=1,5,10,20 50,100, sqrt(n) ). Draw a plot of cross validation errors for different values of K. Which value of K seems to perform the best on this data set? (You can find an example in slides 54-55 of module 4 lecture notes) Note: This might a long time to run on your machine, be patient ( It took about 30 minutes on my machine to run 5-fold cross validation for 6 different K values)**
+
+**14. (3 pt) Use 5-fold cross validation with KNN to predict the income variable and report the average false positive rate (FPR) and false negative rate (FNR) of the classifier. . FPR is the proportion of negative instances classified as positive by the classifier. Similarly, FNR is the proportion of positive instances classified as negative by the classifier.**
+
+
+**It does not matter which class you designate as positive or negative. For instance, you can designate income>50K as positive and income<50K as negative Note : don’t need to tune K again, you can use the best K you found in the previous question. Note: you can find an example of computing false negative rate and false positive rate for each fold in module 5 lecture notes slides 56-59. These slides use a Naïve Bayes classifier for prediction but you can modify it to use knn and report the average FPR and FNR**
+
+
+**15. (2 pt) Consider a majority classifier which always predicts income <50K. Without writing any code, explain what would be the training error of this classifier? ( Note the training error of this majority classifier is simply the proportion of all examples with income>50K because they are all misclassified by this majority classifier). Compare this with the cross validation error of KNN you computed in question 13. Does KNN do better than this majority classifier?**
+
+
+**16. (2 pt) Explain what is the False Positive Rate and False Negative Rate of the majority classifier and how does it compare to the average FPR and FNR of KNN classifier you computed in question 14. You don’t need to write any code to compute FPR and FNR of the majority classifier. You can just compute it based on the definition of FNR and FPR.**
+
+
+
+---
+
+
+
+# Applying Naive Bayes Classifier to sentiment classification of tweets
+
+**1. (1pt) Read the data and store in in the dataframe. Take a look at the structure of data and its variables. We will be working with only two variables: OriginalTweet and Sentiment. Original tweet is a text and Sentiment is a categorical variable with five levels: “extremely positive”, “positive”, “neutral”, “negative”, and “extremely negative”.**
+
+
+**Note: The original tweet variable has some accented character strings. Set fileEncoding="utf-8" parameter inside the read.csv method to ensure those characters are read correctly.**
+
+
+**2. Randomize the order of the rows.**
+
+
+**3. (1pt) Convert sentiment into a factor variable with three levels: “positive, “neutral”, and “negative”. You can do this by labeling all “positive” and “extremely positive” tweets as “positive” and all “negative” and “extremely negative” tweets as “negative”. Now take the “summary” of sentiment to see how many observations/tweets you have for each label.**
+
+
+**4. (2pt) Create a text corpus from OriginalTweet variable. Then clean the corpus, that is convert all tweets to lowercase, stem and remove stop words, punctuations, and additional white spaces.**
+
+
+**5. (2pt)Create separate wordclouds for “positive” and “negative” tweets (set max.words=100 to only show the 100 most frequent words) Is there any visible difference between the frequent words in “positive” vs “negative” tweets?**
+
+
+**6. (1pt) Create a document-term matrix from the cleaned corpus. Then split the data into train and test sets. Use 80% of samples (roughly 32925 rows ) for training and the rest for testing.**
+
+
+**7. (2pt) Remove the words that appear less than 100 times in the training data. Convert frequencies in the document-term matrix to binary yes/no features.**
+
+
+**8. (5pt)Train a Naïve Bayes classifier on the training data and evaluate its performance on the test data. Be patient, training and testing will take a while to run. Answer the following questions:**
+
+- **What is the overall accuracy of the model? ( the percentage of correct predictions)**
+- **What is the accuracy of the model in each category (negative, positive, neutral) ?**
+
