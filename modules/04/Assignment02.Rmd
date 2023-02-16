@@ -24,15 +24,17 @@ Students answers will generally be included in blockquote sections
 Please run the following command for gmodels integration for CrossTable support. 
 If gmodels is not installed please run 
 
-```{R, eval=T}
-install.packages("gmodels")
+```{R,echo=F, eval=F}
 install.packages("class")
+install.packages("caret")
+install.packages("gmodles")
 install.packages("dplyr")
 ```
 And now run to load the extension
-```{R, eval=F}
-library(gmodels)
+```{R, echo=F, eval=T}
 library(class)
+library(caret)
+library(gmodels)
 library(dplyr)
 ```
 Our data is located in the data folder 
@@ -82,7 +84,7 @@ vars_categorical <- function(x){
 ```{R, echo=T, eval=T}
 path = paste(filepath,"adult.data",sep="")
 
-header = c("age","workclass", "fnlwgt", "education", "education-num", "marital", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours_per_week", "native_country","income")
+header = c("age","workclass", "fnlwgt", "education", "education_num", "marital", "occupation", "relationship", "race", "sex", "capital_gain", "capital_loss", "hours_per_week", "native_country","income")
 
 
 data_frame = read.csv(path, header=FALSE, sep=",", stringsAsFactors = TRUE, na.strings="?", col.names=header, strip.white=TRUE)
@@ -114,67 +116,312 @@ table(data_frame$income)
 **4. (3 pts) Explore the data in order to investigate the association between income and the otherfeatures. Which of the other features seem most likely to be useful in predicting income. **
 
 
-> Income is going to most directly associated with capital_gains. Notably if the link is direct enough, then further analysis on the numerical capital_gain variable can be used for numerical analysis tools
+> Capital gains, losses, age, and education , marital status, and occupation are a likely to correlated with income category. Interesting to note that gains, and losses are only reported for 5-10% of participants. 
+
+```{R}
+summary(data_frame$capital_gain)
+summary(data_frame$capital_loss)
+row_gains = length(which(data_frame$capital_gain == 0))
+row_loss = length(which(data_frame$capital_loss==0))
+cat("Missing capital gains for ", row_gains," rows this is representative of ", row_gains/length(data_frame$capital_gain)*100, "% of data\nNo capital losses are reported for ", row_loss/length(data_frame$capital_loss)*100, "% of data \n")
+```
 
 - **To explore the relationship between numerical features and “income” variable, you can use side by side box plot and t.test**
+```{R}
+plot(data_frame$income, data_frame$capital_gain, xlab="Income", ylab="Capital Gain",main="Captial Gains vs Income Category")
+plot(data_frame$income, data_frame$capital_loss, xlab="Income", ylab="Capital Loss", main="Captial Loss vs Income Category")
+plot(data_frame$income, data_frame$fnlwgt, xlab="Income", ylab="Fnlwgt", main="Fnlgwt vs Income Category")
+plot(data_frame$income, data_frame$age, xlab="Income", ylab="Age", main="Age vs Income Category")
+plot(data_frame$income, data_frame$education_num, xlab="Income", ylab="Years Education", main="Years Education vs Income Category")
+plot(data_frame$income, data_frame$hours_per_week, xlab="Income", ylab="Hours Per Week", main="Hours Per Week vs Income Category")
+```
+```{R}
+t.test(data_frame$age~data_frame$income, alternative="two.sided")
+t.test(data_frame$fnlwgt~data_frame$income, alternative="two.sided")
+t.test(data_frame$capital_gain~data_frame$income, alternative="two.sided")
+t.test(data_frame$capital_loss~data_frame$income, alternative="two.sided")
+t.test(data_frame$education_num~data_frame$income, alternative="two.sided")
+t.test(data_frame$hours_per_week~data_frame$income, alternative="two.sided")
+```
+
+> All numerical variables except for fnlgwt show P-values which indicate a statistical significance. We will note however that most p-value displays as < 2.2e16 which doesn't give us a good idea of which variables correlate more to income category status. 
 
 - **To explore the relationship between categorical features and “income” variable, you can use frequency table and chisquare test (note that chisquare test might throw a warning if there are cells whose expected counts in the frequency table is less 5. This warning means the p-values reported from chisquare test may be incorrect due to low counts and are not reliable. You can ignore the warning for this assignment). Based on your data exploration above, decide which attributes you are going to use to predict income.**
 
+```{R}
+print("Age Frequency Table")
+table(data_frame$income,data_frame$age)
+print("Capital Gain Table")
+table(data_frame$income,data_frame$capital_gain)
+print("Capital Loss Table")
+table(data_frame$income,data_frame$capital_loss)
+print("Hours per week table")
+table(data_frame$income,data_frame$hours_per_week)
+print("Education Years Table")
+table(data_frame$income,data_frame$education_num)
+
+chisq.test(data_frame$income, data_frame$age)
+chisq.test(data_frame$income, data_frame$capital_gain)
+chisq.test(data_frame$income, data_frame$capital_loss)
+chisq.test(data_frame$income, data_frame$hours_per_week)
+chisq.test(data_frame$income, data_frame$education_num)
+chisq.test(data_frame$income, data_frame$fnlwgt)
+```
+
 - **Explain your reason for selecting these attributes.**
+
+> Primarily based on the frequency tables we can see that the age distributions appear to be nearly guassian with zero skew-skewedness approximately.The central tendencies for >= 50K seem have their mean/median data points around 40 with <=50K around 25. This can also be guessed from our boxplots. This seems to be our clearest distribution and the diffrerence points to a strong indicator of statistical relevance. This will be our number 1
+
+> The next most salient category with a difference frequency distributions looks to be the education years variable which shows a negative skew with higher median values for >= 50k. This will be our number 2
+
+> Hours per week looking at the frequency table looks to show more variation in the location of peak values and it appears that both <=50k and >=50k show similar distributions which makes it surprising that a p-value of < 2.2e16 was obtained, frequency table analysis doesn't give any quick insights into how the distributions are different other than the fact that those working less hours per week are more prevalent in the <=50k category (positively skewed distribution). This will be our number 5 predictor
+
+>Capital gains/losses may be considered sparsely populated with most data zeroed but there is tendency for frequency peaks to the right and negatively skewed distributions favored for the >=50K distribution indicating a difference and statistical signficance. This will be our number 3/4 predictors
+
+>Frequency tables were not displaying correctly for fnlgwt tables but chi sq shows a p-value of 3.383e-06 which lets us use the alternative hypothesis and keep this variable as a predictor.
+
+
 
 **5. (1 pt) An initial data exploration shows that the missing values in the dataset are denoted by “?” not NA. Change all the “?” characters in the dataframe to NA**
 
+```{R}
+#Write out the data frame as csv file with strings set to NA and reload
+```
+
 
 **6. (1pt) Use the command colSums(is.na(<your dataframe>) to get the number of missing values in each column of your dataframe. Which columns have missing values?**
+```{R}
+na_cols = colSums(is.na(data_frame))
+index_names = which(na_cols > 0)
+names_missing = names(data_frame)[index_names]
+cat("Missing Column Values: ", na_cols, "\n")
+cat("Names of missing cols: ", names_missing, "\n")
+```
 
 **7. (3 pt) There are several ways we can deal with missing values. The easiest approach is to remove all the rows with missing values. However, if a large number of rows have missing values removing them will result in loss of information and may affect the classifier performance. If a large number of rows have missing values, then it is typically better to replace missing data with some values. This is called data imputation. Several methods for missing data imputation exist. The most naïve method (which we will use here) is to replace the missing values with mean of the column (for a numerical column) or mode/majority value of the column (for a categorical column). We will use a more advanced data imputation method in a later module. For now, replace the missing values in a numerical column with the mean of the column and the missing values in a categorical column with the mode/majority of the column. After imputation, use colSums(is.na(<your dataframe>) to make sure that your dataframe no longer has missing values.**
+
+```{R}
+mode <- function(x, na.rm = FALSE) {
+  if(na.rm){x = x[!is.na(x)]}
+  val <- unique(x)
+  return(val[which.max(tabulate(match(x, val)))])
+}
+
+work_mode = mode(data_frame$workclass)
+occ_mode = mode(data_frame$occupation)
+native_mode = mode(data_frame$native_country)
+#Select indices of each column
+work_ind = which(is.na(data_frame$workclass), arr.ind=TRUE)
+occ_ind = which(is.na(data_frame$occupation), arr.ind=TRUE)
+native_ind = which(is.na(data_frame$native_country), arr.ind=TRUE)
+
+data_frame$workclass[work_ind] = work_mode
+data_frame$occupation[occ_ind] = occ_mode
+data_frame$native_country[native_ind] = native_mode
+
+na_cols = colSums(is.na(data_frame))
+index_names = which(na_cols > 0)
+names_missing = names(data_frame)[index_names]
+cat("Missing Column Values: ", na_cols, "\n")
+cat("Names of missing cols: ", names_missing, "\n")
+
+```
 
 
 
 **8. Set the seed of the random number generator to a fixed integer, say 1, so that I can reproduce your work: `set.seed(1)`**
+```{R}
+set.seed(1)
+```
 
 **9. (1pt) Randomize the order of the rows in the dataset.**
+```{R}
+data_frame = sample(x=data_frame, size=length(data_frame), replace=FALSE)
+```
 
 
 **10. (2 pt) This dataset has several categorical variables. With the exception of few models ( such as NaiiveBayes and tree-based models) most machine learning models require numeric features and cannot work directly with categorical data. One way to deal with categorical variables is to assign numeric indices to each level. However, this imposes an artificial ordering on an unordered categorical variable. For example,suppose that we have a categorical variable primary color with three levels: “red”,”blue”,”green”. If we convert “red” to 0 , “blue” to 1 and “green” to 2 then we are telling our model that red < blue< green whichis not correct. A better way to encode an unordered categorical variable is to do one-hot-encoding. In onehot-encoding we create a dummy binary variable for each level of a categorical variable. For example wecan represent the primary color variable by three binary dummy variables, one for each color (red, blue,and green) . If the color is red, then the variable red takes value 1 while blue and green both take the value zero**
+```{R, echo=F}
+#Encode (occupation, race, native_country, education, sex,workclass, relationship, marital)
+#We need to create binary variables for each category value possibility - 1
+
+
+
+```
+
+```{R}
+vars = dummyVars(" ~ .", data=data_frame)
+df_n = data.frame(predict(vars, newdata=data_frame))
+```
 
 **11. (1 pt) Scale all numeric features using Min-Max scaling**
+```{R}
+normalize <- function(x){
+  return ((x-min(x))/(max(x)-min(x)))
+}
 
+
+#Since all variables are one-hot encoded or numeric we can l_apply to the entire data set
+df_n = as.data.frame(lapply(df_n, normalize))
+```
+
+```{R}
+str(df_n)
+```
 
 **12. (3 pts) Use 5-fold cross validation with KNN to predict the “income” variable and report the cross-validation error. ( You can find an example in slides 51-53 of module 4 lecture notes).**
+
+```{R}
+#Lecture notes fold function
+knn_fold <- function(features,target,fold,k){
+train=features[-fold,]
+validation=features[fold,]
+train_labels=target[-fold]
+validation_labels=target[fold]
+validation_preds=knn(train,validation,train_labels,k=k)
+t= table(validation_labels,validation_preds)
+error=(t[1,2]+t[2,1])/(t[1,1]+t[1,2]+t[2,1]+t[2,2])
+return(error)
+}
+
+#Lecture notes Cross Validation Error Function. This runs the knn_fold function targeted
+#aginst each folds vector
+crossValidationError <- function(features,target,k){
+folds=createFolds(target,k=5)
+errors=sapply(folds,knn_fold,features=feature, target=target, k=k)
+return(mean(errors))
+}
+
+
+```
+
+
+
+```{R, eval=F}
+crossValidationError(df_n, data_frame$income, 20)
+```
 
 
 **13. (2 pts) Tune K (the number of nearest neighbors) by trying out different values (starting from k=1 tom k=sqrt(n) where n is the number of observations in the dataset (for example k=1,5,10,20 50,100, sqrt(n) ). Draw a plot of cross validation errors for different values of K. Which value of K seems to perform the best on this data set? (You can find an example in slides 54-55 of module 4 lecture notes) Note: This might a long time to run on your machine, be patient ( It took about 30 minutes on my machine to run 5-fold cross validation for 6 different K values)**
 
+```{R, eval=F}
+
+crossValidationErrorApply <- function(x,features,target){
+folds=createFolds(target,k=5)
+errors=sapply(folds,knn_fold,features=features,
+target=target,k=x)
+return(mean(errors))
+}
+
+ks = c(1,5,10,20,50,100,sqrt(nrow(df_n)))
+errors = sapply(ks, crossValidationErrorApply, features=df_n, target=data_frame$income)
+plot(errors~ks, main="Cross Validation Error vs. K Value", xlab="(k) value", ylab="Error")
+```
+
 **14. (3 pt) Use 5-fold cross validation with KNN to predict the income variable and report the average false positive rate (FPR) and false negative rate (FNR) of the classifier. . FPR is the proportion of negative instances classified as positive by the classifier. Similarly, FNR is the proportion of positive instances classified as negative by the classifier.**
+```{R}
+knn_preds <- function(features,target,fold,k){
+  train=features[-fold,]
+  validation=features[fold,]
+  train_labels=target[-fold]
+  validation_labels=target[fold]
+  validation_preds=knn(train,validation,train_labels,k=k)
+  t = table(validation_labels,validation_preds)
+  return(t)
+}
 
+knn_predict <- function(k,features,target){
+  folds=createFolds(target,k=5)
+  table_list=sapply(folds,knn_preds,features=features,target=target,k=k)
+  return(table_list)
+}
 
-**It does not matter which class you designate as positive or negative. For instance, you can designate income>50K as positive and income<50K as negative Note : don’t need to tune K again, you can use the best K you found in the previous question. Note: you can find an example of computing false negative rate and false positive rate for each fold in module 5 lecture notes slides 56-59. These slides use a Naïve Bayes classifier for prediction but you can modify it to use knn and report the average FPR and FNR**
+table_list = knn_predict(5,features=df_n, target=data_frame$income)
+```
+
+```{R}
+
+t = table_list
+
+#Probably some unique R method to distill simple tables and merge by columns or rows
+#into a specified format but I'm just doing this.
+merge_cols_truth <- function(x, rows, cols){
+  t = matrix(c(1:rows),ncol=2,byrow=TRUE)
+  for(i in 1:rows){
+    c_sum = 0
+    for(j in 1:cols){
+      c_sum = c_sum + x[i,j]
+    }
+    t[i] = c_sum
+  }
+  return(t)
+}
+m = merge_cols_truth(t,4,5)
+print(m,2,2)
+
+FPR = m[1,2]/(m[1,2]+m[1,1])
+FNR =  m[2,1]/(m[2,1]+m[2,2])
+
+cat("False Positive Rate: ", FPR, "%\n")
+cat("False Negative Rate: ", FNR, "%\n")
+```
+
 
 
 **15. (2 pt) Consider a majority classifier which always predicts income <50K. Without writing any code, explain what would be the training error of this classifier? ( Note the training error of this majority classifier is simply the proportion of all examples with income>50K because they are all misclassified by this majority classifier). Compare this with the cross validation error of KNN you computed in question 13. Does KNN do better than this majority classifier?**
 
+> In this case the error rate is the number of total positive test samples / sample size, which is equal to 23% error rate on the majority calssifier. The KNN classifier performs better than a majority classifer always. 
+
 
 **16. (2 pt) Explain what is the False Positive Rate and False Negative Rate of the majority classifier and how does it compare to the average FPR and FNR of KNN classifier you computed in question 14. You don’t need to write any code to compute FPR and FNR of the majority classifier. You can just compute it based on the definition of FNR and FPR.**
 
+> The false positive/negative rates of a majority classifer first depends on whether the majority classifer is aligned as a positive or negative classifier. If not for example a negative majority classifier will never produce a positive result so there can be no false positives in the sample base, aka 0% FPR. 
 
+> For majority classifier negative rate will always the number of positive_label_samples/N where N is the size of the set.
+
+> A positive classifier will retain a false positive rate of negative_label_samples/N.
+
+> For our majority classifer we have **False Negative Rate = 24%** while our majority classifer could also have **False Positve Rate = 75%**. 
+
+>These rates are much higher than what our KNNs produced in any instance. 
 
 ---
 
 
-
 # Applying Naive Bayes Classifier to sentiment classification of tweets
+```{R, eval=F}
+install.packages("pracma") #provides math library including random
+library(pracma)
+```
 
 **1. (1pt) Read the data and store in in the dataframe. Take a look at the structure of data and its variables. We will be working with only two variables: OriginalTweet and Sentiment. Original tweet is a text and Sentiment is a categorical variable with five levels: “extremely positive”, “positive”, “neutral”, “negative”, and “extremely negative”.**
+```{R}
+#iso-8859-1 derived from kaggle source
+tweet_df = read.csv("Corona_NLP_train.csv", fileEncoding = "iso-8859-1", na.strings = "", stringsAsFactors =FALSE)
+head(tweet_df)
+```
 
 
 **Note: The original tweet variable has some accented character strings. Set fileEncoding="utf-8" parameter inside the read.csv method to ensure those characters are read correctly.**
 
 
 **2. Randomize the order of the rows.**
+```{R}
+r = rand()/rand()*100
+set.seed(r)
+tweet_df = tweet_df[sample(nrow(tweet_df)),]
+head(tweet_df)
+```
 
 
 **3. (1pt) Convert sentiment into a factor variable with three levels: “positive, “neutral”, and “negative”. You can do this by labeling all “positive” and “extremely positive” tweets as “positive” and all “negative” and “extremely negative” tweets as “negative”. Now take the “summary” of sentiment to see how many observations/tweets you have for each label.**
+
+```{R}
+# Generate Desired Factors (TweetAt/Original Tweet left as char vectors)
+tweet_df$Sentiment = as.factor(tweet_df$Sentiment)
+levels(tweet_df$Sentiment)
+summary(tweet_df$Sentiment)
+```
 
 
 **4. (2pt) Create a text corpus from OriginalTweet variable. Then clean the corpus, that is convert all tweets to lowercase, stem and remove stop words, punctuations, and additional white spaces.**
