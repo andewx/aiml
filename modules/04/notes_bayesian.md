@@ -84,3 +84,5 @@ So given this table as an abstract:
 
 We have `P(B&A)` = $P(B|A) * P(A)$ Which is = ${{4} \over {20}} * {20 \over {100}} = {0.04}.$
 
+But when we divide by $P(B) = {5 \over 100}$ then we get $P(A|B) = {P(B|A)*P(A)} \over {P(B)} = 0.80$
+
