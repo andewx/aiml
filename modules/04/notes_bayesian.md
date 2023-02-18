@@ -84,5 +84,5 @@ So given this table as an abstract:
 
 We have `P(B&A)` = $P(B|A) * P(A)$
 
-Which is = $4\over{20} * 20\over{100} = 0.04$
+Which is = ${4}\over{20} * {20}\over{100} = {0.04}$
 
