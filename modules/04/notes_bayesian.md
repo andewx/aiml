@@ -86,3 +86,5 @@ We have `P(B&A)` = $P(B|A) * P(A)$ Which is = ${{4} \over {20}} * {20 \over {100
 
 But when we divide by $P(B) = {5 \over 100}$ then we get $P(A|B)$  $=$ ${P(B|A)*P(A)} \over {P(B)}$ $= 0.80$
 
+So given the fact that B occured, for example the word *viagara* was used, then there is a posterior probability of 80% that the message is spam, or that A is validated. 
+
