@@ -26,7 +26,7 @@ We want to find out a more reasonable estimate which estimates the probability t
 
 **Original Theorem**
 
-$$P(A|B) = {P(B \inter A)P(B) \over {P(B)}$$ which can be read out loud as:
+$$P(A|B) = {P(B \union A)P(B) \over {P(B)}$$ which can be read out loud as:
 
 The probability that the event A occurs given the event B has already occured. Here `B` is the known. This known as he *conditional probability*
 
