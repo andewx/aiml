@@ -88,3 +88,35 @@ But when we divide by $P(B) = {5 \over 100}$ then we get $P(A|B)$  $=$ ${P(B|A)*
 
 So given the fact that B occured, for example the word *viagara* was used, then there is a posterior probability of 80% that the message is spam, or that A is validated. 
 
+## Naive Bayes Algorithm
+
+**Strengths**
+
+ - Simple,fast, effective
+ - Handles noise
+ - Few examples to train
+ - Easy to obtain estimates
+
+**Weaknesses**
+ - Faulty assumption of independence of features
+ - Fails with numeric heavy datasets
+ - Estimated probabilityes are less reliable than the predicted classes.
+
+*Overall* Naive Bayes is a reasonable baseline candidate for classification learning. Even though faulty assumptions and feature dependencies violate model assumptions.
+
+
+Given a dataset evaluating spam words with N word features (i.e. Viagara, Money, Free, Subscribe) = 4. We can evaluate the following formula:
+
+`P(A|X_i) = P(Intersection of X_i Features | A) * P(A) / P(Intersection of X_i Features)`
+
+This formula requires
+- Unlimited memory for arbitrary features and calculation of intersections 
+- Joint probability Zero
+
+Solution: Use Naive assumption of independence of events. **Class Conditional Independence**. 
+
+This means events are independent as long as their condition relies on the same class. Which allows us to estimate an intersection of `P(A&B)` as `P(A) * P(B)`
+
+This simplifying assumption no longer dependends on the total intersection calculation but the likelihood probabilities of each event being observed `B` and the class its observed against `A` . 
+
+`P(A|X_i)` proportional to $\prod_i{P(X_i|A)}$
