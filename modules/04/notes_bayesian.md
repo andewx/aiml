@@ -66,4 +66,18 @@ $$ P(A|B) = P(\prod_n{A_n})*P(B|A)\over{P(B)}$$
 
 Where Posterior is Proportional to the Likelihood times teh Prior. 
 
-In terms of our evaluating our current data. 
+In terms of our evaluating our current data set without the concepts of self updates...we can look at a frequency table of events.
+
+### Bayesian Frequency Tables
+
+In a frequency table each event (and its compliment) can be related to another event througha  frequency table (truth table). Where one of four combinations of events can occur, in boolean logic these sectors would be the `[AND, A_OR, B_OR, NAND]` or if we are evaluating a hypothesis: `[Validate, False Positive, False Negative, Negate]`.
+
+To compute the Posterior probability $P(A|B)$ we can first get the intersection `P(A & B) = P(B|A) * P(A)`.  And then we would divide this result by `P(B)`.
+
+So given this table as an abstract:
+
+| A - A' | B | B' | Totals |
+| ------ | - | -- | ------ |
+| A | 4 | 16 | 20 |
+| A' | 1 | 79 | 80 |
+| Total | 5 | 95 | 100 |
