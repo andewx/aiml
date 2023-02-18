@@ -36,7 +36,7 @@ The probability that the event A occurs given the event B has already occured. H
 
 $$P(A|B) = P(B|A)P(A)\over{P(B)}$$ which is the classic *Bayes Theorem*:
 
-This takes advantage of the fact that $P(A \inter B) = P(B | A) P(A)$.
+This takes advantage of the fact that $P(A|B) = P(B|A)*P(A)$.
 
 So we are evaluating the conditional prbability of B occuring with A times the event likelihood of A over the event likelihood of B. I  like to look at this as $$P(A|B)\over{P(B|A)} = P(A)\over{P(B)}$$
 
