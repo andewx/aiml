@@ -119,4 +119,4 @@ This means events are independent as long as their condition relies on the same 
 
 This simplifying assumption no longer dependends on the total intersection calculation but the likelihood probabilities of each event being observed `B` and the class its observed against `A` . 
 
-`P(A|X_i)` proportional to $\prod_i{P(X_i|A)}$
+`P(A|X_i)` proportional to $\prod_i{P(X_i|A) * P(A)}$
