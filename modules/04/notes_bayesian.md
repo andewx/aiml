@@ -120,3 +120,20 @@ This means events are independent as long as their condition relies on the same 
 This simplifying assumption no longer dependends on the total intersection calculation but the likelihood probabilities of each event being observed `B` and the class its observed against `A` . 
 
 `P(A|X_i)` proportional to $\prod_i{P(X_i|A) * P(A)}$
+
+This means we can use the values in our likelihood table independently to compute overall likelihoods for a posterior. A scale factor of `z` or $1\overZ$ converts the likelihood values to probabilities.
+
+## Algorithm 
+
+$$P(C_l|F,...,F_n) = {1\overZ}*{\prod_{i=1}p(C_l|F_i)}*p(C_l)$$
+
+Where $F_i$ is the feature provided
+
+And $C_l$ is the probability of level $l$ of the class being evaluated. 
+
+Overall we build a frequency table... then build the likelihood table...and multiply out the conditional probabilities with the naive assumptionof independence. 
+Finally divide the taol likelihood to transform likelihoods into a probability. 
+
+**Laplace Estimator** provides a estimation value of 1 for probabilities of 0 that would result in a negated probability. 
+
+**Numeric Features** can be handled by discretizing numerical ranges into bins. You may choose bins for natural cateogries or cut points in the distribution. 
