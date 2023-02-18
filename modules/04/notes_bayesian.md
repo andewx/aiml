@@ -81,3 +81,8 @@ So given this table as an abstract:
 | A | 4 | 16 | 20 |
 | A' | 1 | 79 | 80 |
 | Total | 5 | 95 | 100 |
+
+We have `P(B&A)` = $P(B|A) * P(A)$
+
+Which is = $ 4\over20 * 20\over100 = 0.04$
+
