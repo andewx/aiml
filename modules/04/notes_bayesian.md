@@ -26,7 +26,7 @@ We want to find out a more reasonable estimate which estimates the probability t
 
 **Original Theorem**
 
-$$P(A|B)=P(B&A)P(B)\over{P(B)}$$ 
+$$P(A|B)=P(B|A)P(B)\over{P(B)}$$ 
 
 Which can be read out loud as:
 
@@ -34,15 +34,17 @@ The probability that the event A occurs given the event B has already occured. H
 
 **Bayes Theorem** states that the best of estimate of `P(A|B)` is the proporition of trials in which `A` occured with `B`. `A` in this case is *dependent* on `B`. So we are saying based on the occurence of `B` itself, if we know how often `A & B` occurs then our estimate is based on that intersection over the total probability of event `B` occuring.  
 
-$$P(A|B) = {P(B|A)P(A) \over {P(B)}$$ which is the classic *Bayes Theorem*:
+$$P(A|B) = P(B|A)P(A)\over{P(B)}$$ which is the classic *Bayes Theorem*:
 
 This takes advantage of the fact that $P(A \inter B) = P(B | A) P(A)$.
 
-So we are evaluating the conditional prbability of B occuring with A times the event likelihood of A over the event likelihood of B. I  like to look at this as $$P(A | B) \over {P(B | A)} = {P(A) \over {P(B)}$$. Or in another words the ratio of interdependent probabilities `A` is co-dependent with `B` is equal to the ratio of  A and B. 
+So we are evaluating the conditional prbability of B occuring with A times the event likelihood of A over the event likelihood of B. I  like to look at this as $$P(A|B)\over{P(B|A)} = P(A)\over{P(B)}$$
 
-The theoreem presents the following systems:
+Or in another words the ratio of interdependent probabilities `A` is co-dependent with `B` is equal to the ratio of  A and B. 
 
-$$P(A|B) = {P(B|A)P(A) \over {P(B)}$$
+The theorem presents the following systems:
+
+$$P(A|B) = P(B|A)P(A)\over{P(B)}$$
 
 **Marginal Likelihood** as $P(B)$
 
@@ -59,9 +61,9 @@ The condition `P(B|A)` is then a likelihood of our data occuring uhe r teh assum
 
 In updating our **prior becomes our old posterior** $P(A) = P(A|B_1)$ so that the expression for Bayes tehorem exapands to include our updated beliefs.
 
-$$ P(A|B) = {P(\prod_n{A_n})*P(B|A)}\over{P(B)}$$
+$$ P(A|B) = P(\prod_n{A_n})*P(B|A)\over{P(B)}$$
 
 
-Where Posterior is Propritional to the Likelihood times teh Prior. 
+Where Posterior is Proportional to the Likelihood times teh Prior. 
 
-In terms of our tevaluating our current data. 
+In terms of our evaluating our current data. 
