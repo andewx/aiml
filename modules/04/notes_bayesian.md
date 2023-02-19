@@ -121,11 +121,11 @@ This simplifying assumption no longer dependends on the total intersection calcu
 
 `P(A|X_i)` proportional to $\prod_i{P(X_i|A) * P(A)}$
 
-This means we can use the values in our likelihood table independently to compute overall likelihoods for a posterior. A scale factor of `z` or $1\overZ$ converts the likelihood values to probabilities.
+This means we can use the values in our likelihood table independently to compute overall likelihoods for a posterior. A scale factor of `z` or $1\over{Z}$ converts the likelihood values to probabilities.
 
 ## Algorithm 
 
-$$P(C_l|F,...,F_n) = {1\overZ}*{\prod_{i=1}p(C_l|F_i)}*p(C_l)$$
+$$P(C_l|F,...,F_n) = {1\over{Z}}*{\prod_{i=1}p(C_l|F_i)}*p(C_l)$$
 
 Where $F_i$ is the feature provided
 
