@@ -121,7 +121,10 @@ Where ${P(C|T)}$ $=$ ${{P(T|C)*P(C)}\over{P(T)}}$
 - Therefore we can say that $P(T)$ $=$ $P(T|C)*P(C) + P(T|C')*P(C')$
 - $P(T)$ $=$ $0.8 * 0.004 + 0.1*0.996$
 - And now we can solve the entire Bayesian formula as 
-- ${{P(T|C)*P(C)}\over{P(T|C)*P(C) + P(T|C')*P(C')}}$ $=$ ${{0.8*0.004}\over{0.8*0.004 + 0.1*0.996}}$ $=$ $0.031$
+- ${P(T|C)*P(C)}\over{P(T|C)*P(C) + P(T|C')*P(C')}$ $=$ ${0.8*0.004}\over{0.8*0.004 + 0.1*0.996}$ $=$ $0.031$
+
+
+**Note just use the frequency tables if possible**
 
 
 
