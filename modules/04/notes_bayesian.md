@@ -121,7 +121,7 @@ Where ${P(C|T)}$ $=$ ${{P(T|C)*P(C)}\over{P(T)}}$
 - Therefore we can say that $P(T)$ $=$ $P(T|C)*P(C) + P(T|C')*P(C')$
 - $P(T)$ $=$ $0.8 * 0.004 + 0.1*0.996$
 - And now we can solve the entire Bayesian formula as 
-- ${P(T|C)*P(C)}\over{P(T|C)*P(C) + P(T|C')*P(C')}$ $=$ ${0.8*0.004}\over{0.8*0.004 + 0.1*0.996}$ $=$ $0.031$
+- ${P(T|C)*P(C)}\over{P(T|C)*P(C)+P(T|C')*P(C')}$ $= {0.8*0.004}\over{0.8*0.004 + 0.1*0.996}$ $=$ $0.031$
 
 
 **Note just use the frequency tables if possible**
@@ -174,6 +174,18 @@ And $C_l$ is the probability of level $l$ of the class being evaluated.
 Overall we build a frequency table... then build the likelihood table...and multiply out the conditional probabilities with the naive assumptionof independence. 
 Finally divide the taol likelihood to transform likelihoods into a probability. 
 
-**Laplace Estimator** provides a estimation value of 1 for probabilities of 0 that would result in a negated probability. 
+**Laplace Estimator** provides a estimation value of 1 for probabilities of 0 that would result in a negated probability. Adding a one for each row would have negligible effect for large data sets. 
+
+Formula is $P(X_i) = {X_i + 1}\over{N +w}$ where $N$ is the number of total observed events for $X_i$ and $w$ is the feature vector width.
+
+Gives us a non-zero estimate correction. 
 
 **Numeric Features** can be handled by discretizing numerical ranges into bins. You may choose bins for natural cateogries or cut points in the distribution. 
+
+
+## Maximum A Posteriori Probability Estimate (MAP)
+- Map is used to estimate an unobserved population parameter $\theta$
+- We use the likelihood $P(D | \theta)$ and prior $P(\theta)$
+- Choose the Bayesian classifier that maximizes the probability hypothesis
+- Bayesian Classifies are special case of MAP estimation. Choose the class that maximizes the probability.
+- 
