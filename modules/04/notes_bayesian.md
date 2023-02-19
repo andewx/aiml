@@ -57,16 +57,18 @@ $$P(A|B) = P(B|A)P(A)\over{P(B)}$$
 
 The reason we are *updating* is based on when we present the prior `A` as the hypothesis while `B` is based on our data. 
 
-The condition `P(B|A)` is then a likelihood of our data occuring uhe r teh assumptions of our hypothesiAlso note that  `P(B)` is also sometimes called *normalizing constant** (*not in our reading*). And is calcualted from_n $P(B) = \sum{P(A_n)P(B|A_n)$. 
+The condition `P(B|A)` is then a likelihood of our data occuring under the assumptions of our hypothesis. Also note that  `P(B)` is also sometimes called *normalizing constant** (*not in our reading*). And is calcualted from_n $P(B) = \sum{P(A_n)P(B|A_n)$. 
 
 In updating our **prior becomes our old posterior** $P(A) = P(A|B_1)$ so that the expression for Bayes tehorem exapands to include our updated beliefs.
 
 $$ P(A|B) = P(\prod_n{A_n})*P(B|A)\over{P(B)}$$
 
 
-Where Posterior is Proportional to the Likelihood times teh Prior. 
-
-In terms of our evaluating our current data set without the concepts of self updates...we can look at a frequency table of events.
+### Interpretation of Bayes Law (Class Hypothesis $C_i$ with Data $D$)
+ - ${P(C_i | D)}$ $=$ ${P(D|C_i)*P(C_i)\over{P(D)}}$
+ - ${P(C_i)$ is the **prior probability** - it reflects our belief that $C_i$ occurs with a fixed probability $P(C_i)$
+ - ${P(D|C_i)}$ is the **likelihood** which is the likelihood of observing the data $D$ if the class is $C_i$
+ - In Bayes theorem with revise our prior $P(C_i)$  that class $C_i$ occurs to a new **posterior probability** ${P(C_i|D)}$ that reflects new information contained in data $D$ so that we learn from new data. 
 
 ### Bayesian Frequency Tables
 
@@ -87,6 +89,41 @@ We have `P(B&A)` = $P(B|A) * P(A)$ Which is = ${{4} \over {20}} * {20 \over {100
 But when we divide by $P(B) = {5 \over 100}$ then we get $P(A|B)$  $=$ ${P(B|A)*P(A)} \over {P(B)}$ $= 0.80$
 
 So given the fact that B occured, for example the word *viagara* was used, then there is a posterior probability of 80% that the message is spam, or that A is validated. 
+
+### Bayesian Problem Example
+
+> Medical test for mammograms is reported to report validated positives (**sensitivity**) for 80% of cancer cases. Lets construct the frequency table from this data. *(Prime ' quotes indicate event compliments so Test' = Negative test result)*
+
+| | Test | Test' | Totals |
+| ------ | - | -- | ------ |
+| Cancer | 8 | 2 | 10 |
+| Cancer' | 250 | 2250 | 2500|
+| Total | 258 | 2252| 2510|
+
+So to identify the probability of having cancer with a positive mammogram we need to compute $P({C|T})$ as a posterior.
+
+Where ${P(C|T)}$ $=$ ${{P(T|C)*P(C)}\over{P(T)}}$
+
+**NOTE**
+
+- Where $P(C) = 0.004$
+
+- And $P(T|C) = 0.8$
+- Now find $P(T)$ : According to our frequency table we built $P(T) = 258/2510$ or $0.10$
+
+**Finding P(T) by mutual exclusion**
+
+- Define $P(T)$ by its intersection with events $B_i$ where each  $B_i$ is mutually exclusive and covers the entire event space.
+- $P(T)$ $=$ ${\sum_{i=1}P(T,B_i)}$
+- $P(T)$ $=$ ${\sum_{i=1}P(T|B_i)*P(B_i)}$ - sum of observation of $T$ in each data $B_i$
+- In our case $B_0 = C$ so $B_0 = 0.004$ 
+- And $B_1 = C'$ so $B_1 = 0.996$
+- Therefore we can say that $P(T)$ $=$ $P(T|C)*P(C) + P(T|C')*P(C')$
+- $P(T)$ $=$ $0.8 * 0.004 + 0.1*0.996$
+- And now we can solve the entire Bayesian formula as 
+- ${{P(T|C)*P(C)}\over{P(T|C)*P(C) + P(T|C')*P(C')}}$ $=$ ${{0.8*0.004}\over{0.8*0.004 + 0.1*0.996}}$ $=$ $0.031$
+
+
 
 ## Naive Bayes Algorithm
 
