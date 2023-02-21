@@ -185,7 +185,7 @@ chisq.test(data_frame$income, data_frame$fnlwgt)
 **5. (1 pt) An initial data exploration shows that the missing values in the dataset are denoted by “?” not NA. Change all the “?” characters in the dataframe to NA**
 
 ```{R}
-df = replace(df, df=="?", NA)
+data_frame = replace(df, df=="?", NA)
 ```
 
 
